@@ -2,6 +2,7 @@ package bg.sofia.uni.fmi.mjt.burnout;
 
 import bg.sofia.uni.fmi.mjt.burnout.exception.InvalidSubjectRequirementsException;
 import bg.sofia.uni.fmi.mjt.burnout.plan.SemesterPlan;
+import bg.sofia.uni.fmi.mjt.burnout.semester.ComputerScienceSemesterPlanner;
 import bg.sofia.uni.fmi.mjt.burnout.semester.SoftwareEngineeringSemesterPlanner;
 import bg.sofia.uni.fmi.mjt.burnout.subject.Category;
 import bg.sofia.uni.fmi.mjt.burnout.subject.SubjectRequirement;
@@ -13,7 +14,8 @@ import java.util.Arrays;
 public class Main {
 
     public static void main(String... args) throws InvalidSubjectRequirementsException {
-        SoftwareEngineeringSemesterPlanner planner = new SoftwareEngineeringSemesterPlanner();
+        SoftwareEngineeringSemesterPlanner sePlanner = new SoftwareEngineeringSemesterPlanner();
+        ComputerScienceSemesterPlanner csPlanner = new ComputerScienceSemesterPlanner();
 
         UniversitySubject[] subjects = {
                 new UniversitySubject("Calculus", 6, 5, Category.MATH, 40),
@@ -30,24 +32,33 @@ public class Main {
         SemesterPlan plan1 = new SemesterPlan(subjects, requirements, 5);
 
 
-        printSubjects(planner.calculateSubjectList(plan1));
+        printSubjects(sePlanner.calculateSubjectList(plan1));
         //result1 = ["Calculus", "Java Programming"]
 
         SemesterPlan plan2 = new SemesterPlan(subjects, requirements, 10);
 
         //result2 = ["Calculus", "Java Programming"]
-        printSubjects(planner.calculateSubjectList(plan2));
+        printSubjects(sePlanner.calculateSubjectList(plan2));
 
         SemesterPlan plan3 = new SemesterPlan(subjects, requirements, 15);
 
         //result3 = ["Calculus", "Linear Algebra", "Java Programming"]
-        printSubjects(planner.calculateSubjectList(plan3));
+        printSubjects(sePlanner.calculateSubjectList(plan3));
 
-        UniversitySubject[] selectedSubjects = planner.calculateSubjectList(plan1);
+        UniversitySubject[] selectedSubjects = sePlanner.calculateSubjectList(plan1);
 
-        int jarCount = planner.calculateJarCount(selectedSubjects, 11, 50);
+        int jarCount = sePlanner.calculateJarCount(selectedSubjects, 11, 50);
         System.out.println("Jar count: " + jarCount);
         //jarCount = 28
+
+        SemesterPlan csPlan = new SemesterPlan(subjects, requirements, 10);
+        UniversitySubject[] csSubjects = csPlanner.calculateSubjectList(csPlan);
+        printSubjects(csSubjects);
+        //result3 = ["Data Structures", "Calculus", "Linear Algebra"]
+
+        int csJarCount = csPlanner.calculateJarCount(csSubjects, 10, 45);
+        System.out.println("Jar count: " + csJarCount);
+        //jarCount = 39
     }
 
     private static void printSubjects(UniversitySubject[] subjects) {

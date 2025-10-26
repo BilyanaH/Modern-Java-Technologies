@@ -17,7 +17,7 @@ public abstract sealed class AbstractSemesterPlanner implements  SemesterPlanner
     protected int Partition(UniversitySubject[] subjects, int leftIndex, int rightIndex, boolean byRating){
         int pivot = byRating ? subjects[rightIndex].rating() : subjects[rightIndex].credits();
         int maxElementIndex = leftIndex-1;
-        for (int i = leftIndex; i <= maxElementIndex; i++){
+        for (int i = leftIndex; i <= rightIndex; i++){
             int value = byRating ? subjects[i].rating() : subjects[i].credits();
             if(value>pivot){
                 maxElementIndex++;
@@ -58,10 +58,10 @@ public abstract sealed class AbstractSemesterPlanner implements  SemesterPlanner
             throw new IllegalArgumentException("Subjects array can't be null");
         }
         if(maximumSlackTime<=0){
-            throw new IllegalArgumentException("MaximumSlackTime can't be positive");
+            throw new IllegalArgumentException("MaximumSlackTime must be positive");
         }
         if(semesterDuration<=0){
-            throw new IllegalArgumentException("SemesterDuration can't be positive");
+            throw new IllegalArgumentException("SemesterDuration must be positive");
         }
         double restNeeded = 0;
         double studyTime = 0;
@@ -73,7 +73,8 @@ public abstract sealed class AbstractSemesterPlanner implements  SemesterPlanner
         if(studyTime+restNeeded>semesterDuration){
             jarCount*=2;
         }
-        if(semesterDuration-(studyTime+restNeeded)<maximumSlackTime){
+        double slackTime = semesterDuration - (studyTime + restNeeded);
+        if(slackTime > maximumSlackTime){
             throw new DisappointmentException("Too much rest time, grandma is disappointed!");
         }
         return jarCount;

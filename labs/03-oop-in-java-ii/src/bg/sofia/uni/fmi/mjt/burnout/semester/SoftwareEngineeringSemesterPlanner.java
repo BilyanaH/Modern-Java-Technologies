@@ -23,36 +23,45 @@ public final class SoftwareEngineeringSemesterPlanner extends AbstractSemesterPl
         for (int i = 0; i < semesterPlan.subjectRequirements().length; i++) {
             requiredCounts[i] = semesterPlan.subjectRequirements()[i].minAmountEnrolled();
         }
-        boolean areSubjectsEnough = true;
-        for (var subject : sortedSubjects){
-            areSubjectsEnough = true;
+        UniversitySubject[] result = new UniversitySubject[subjectLength];
+        for (var i =0; i<subjectLength; i++){
+            var subject = sortedSubjects[i];
             int categoryIndex = -1;
-            for(int i=0; i < semesterPlan.subjectRequirements().length; i++){
-                if(semesterPlan.subjectRequirements()[i].category()==subject.category()){
-                    categoryIndex = i;
-                    requiredCounts[i]--;
-                }
-                if(requiredCounts[i]!=0){
-                    areSubjectsEnough=false;
+            for(int j=0; j < semesterPlan.subjectRequirements().length; j++){
+                if(semesterPlan.subjectRequirements()[j].category()==subject.category()){
+                    categoryIndex = j;
+                    break;
                 }
             }
-            if(requiredCounts[categoryIndex]==0){
-                continue;
+            if(categoryIndex != -1 && requiredCounts[categoryIndex]>0){
+                result[count++] = subject;
+                totalCredits += subject.credits();
+                requiredCounts[categoryIndex] -= 1;
+                sortedSubjects[i]=null;
             }
-            totalCredits+=subject.credits();
-            count++;
-            if(totalCredits>=semesterPlan.minimalAmountOfCredits()&&areSubjectsEnough){
+        }
+        for (int i = 0; i < requiredCounts.length; i++) {
+            if (requiredCounts[i] > 0) {
+                throw new CryToStudentsDepartmentException("Can't meet minimum category requirements for" + semesterPlan.subjectRequirements()[i].category());
+            }
+        }
+        for (var subject : sortedSubjects){
+            if(subject!=null){
+                result[count++] = subject;
+                totalCredits += subject.credits();
+            }
+            if (totalCredits >= semesterPlan.minimalAmountOfCredits()) {
                 break;
             }
-
         }
-        if (totalCredits < semesterPlan.minimalAmountOfCredits()&&!areSubjectsEnough) {
+
+        if (totalCredits < semesterPlan.minimalAmountOfCredits()) {
             throw new CryToStudentsDepartmentException("Can't meet minimum credit requirements");
         }
-        UniversitySubject[] result = new UniversitySubject[count];
-        for (int i = 0; i < count; i++) {
-            result[i] = sortedSubjects[i];
+        UniversitySubject[] finalResult = new UniversitySubject[count];
+        for(int i =0; i<count; i++){
+            finalResult[i]=result[i];
         }
-        return result;
+        return finalResult;
     }
 }
